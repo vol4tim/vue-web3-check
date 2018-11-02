@@ -4,6 +4,7 @@
     <slot name="notWeb3" v-else-if="status == 'NotWeb3'"><NotWeb3 /></slot>
     <slot name="depNetwork" v-else-if="status == 'DepNetwork'"><DepNetwork /></slot>
     <slot name="notAccounts" v-else-if="status == 'NotAccounts'"><NotAccounts /></slot>
+    <slot name="noAccess" v-else-if="status == 'NoAccess'"><NoAccess @requestAccess="requestAccess" /></slot>
     <slot v-else></slot>
   </div>
 </template>
@@ -12,6 +13,7 @@
 import NotWeb3 from './NotWeb3.vue'
 import DepNetwork from './DepNetwork.vue'
 import NotAccounts from './NotAccounts.vue'
+import NoAccess from './NoAccess.vue'
 import Load from './Load.vue'
 
 export default {
@@ -20,9 +22,19 @@ export default {
     NotWeb3,
     DepNetwork,
     NotAccounts,
+    NoAccess,
     Load
   },
-  props: ['networks'],
+  props: {
+    networks: {
+      type: Array,
+      default: [1]
+    },
+    access: {
+      type: Boolean,
+      default: true
+    }
+  },
   data () {
     return {
       status: 'Load'
@@ -63,15 +75,41 @@ export default {
       }
       accountInterval()
     },
+    checkAccount () {
+      setTimeout(() => {
+        if (window.web3.eth.accounts.length > 0) {
+          this.canNetwork()
+        } else if (window.web3.eth.accounts.length <= 0) {
+          this.status = 'NotAccounts'
+        }
+        this.listeningChangeAccount()
+      }, 500)
+    },
+    async requestAccess () {
+      try {
+        await window.ethereum.enable()
+        this.checkAccount()
+      } catch (error) {
+        console.log(error)
+        this.status = 'NoAccess'
+      }
+    },
     load () {
       window.addEventListener('load', () => {
-        if (typeof web3 !== 'undefined') {
-          if (web3.eth.accounts.length > 0) {
+        if (window.ethereum) {
+          window.web3 = new Web3(window.ethereum)
+          if (this.access) {
+            this.requestAccess()
+          } else {
             this.canNetwork()
-          } else if (web3.eth.accounts.length <= 0) {
-            this.status = 'NotAccounts'
           }
-          this.listeningChangeAccount()
+        } else if (window.web3) {
+          window.web3 = new Web3(web3.currentProvider)
+          if (this.access) {
+            this.checkAccount()
+          } else {
+            this.canNetwork()
+          }
         } else {
           this.status = 'NotWeb3'
         }
