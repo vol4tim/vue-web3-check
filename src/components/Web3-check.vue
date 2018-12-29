@@ -44,21 +44,40 @@ export default {
     this.load()
   },
   methods: {
-    canNetwork () {
-      web3.version.getNetwork((e, r) => {
-        const check = this.networks.find((item) => {
-          if (Number(item) === Number(r)) {
-            return true
-          } else {
-            return false
-          }
-        })
-        if (check) {
-          this.status = ''
+    checkNetwork (network) {
+      const check = this.networks.find((item) => {
+        if (Number(item) === network) {
+          return true
         } else {
-          this.status = 'DepNetwork'
+          return false
         }
       })
+      if (check) {
+        this.status = ''
+        return true
+      }
+      this.status = 'DepNetwork'
+      return false
+    },
+    listenNetwork () {
+      web3.version.getNetwork((e, r) => {
+        this.checkNetwork(Number(r))
+        this.listeningChangeNetwork(Number(r))
+      })
+    },
+    listeningChangeNetwork (current) {
+      const networkInterval = (network) => {
+        web3.version.getNetwork((e, r) => {
+          if (Number(r) !== network) {
+            const check = this.checkNetwork(Number(r))
+            this.$emit('changeNetwork', { network: Number(r), check })
+          }
+          setTimeout(() => {
+            networkInterval(Number(r))
+          }, 1000)
+        })
+      }
+      networkInterval(current)
     },
     listeningChangeAccount () {
       let [account] = web3.eth.accounts
@@ -67,7 +86,7 @@ export default {
           this.status = 'NotAccounts'
         } else if (web3.eth.accounts[0] !== account) {
           [account] = web3.eth.accounts
-          this.canNetwork()
+          this.$emit('changeAccount')
         }
         setTimeout(() => {
           accountInterval()
@@ -75,10 +94,10 @@ export default {
       }
       accountInterval()
     },
-    checkAccount () {
+    isAccount () {
       setTimeout(() => {
         if (window.web3.eth.accounts.length > 0) {
-          this.canNetwork()
+          this.listenNetwork()
         } else if (window.web3.eth.accounts.length <= 0) {
           this.status = 'NotAccounts'
         }
@@ -88,7 +107,7 @@ export default {
     async requestAccess () {
       try {
         await window.ethereum.enable()
-        this.checkAccount()
+        this.isAccount()
       } catch (error) {
         console.log(error)
         this.status = 'NoAccess'
@@ -101,14 +120,14 @@ export default {
           if (this.access) {
             this.requestAccess()
           } else {
-            this.canNetwork()
+            this.listenNetwork()
           }
         } else if (window.web3) {
           window.web3 = new Web3(web3.currentProvider)
           if (this.access) {
-            this.checkAccount()
+            this.isAccount()
           } else {
-            this.canNetwork()
+            this.listenNetwork()
           }
         } else {
           this.status = 'NotWeb3'
