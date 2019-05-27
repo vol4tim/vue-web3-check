@@ -28,6 +28,7 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   },
   globals: {
-    "web3": true
+    "web3": true,
+    "Web3": true
   }
 }

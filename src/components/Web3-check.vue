@@ -1,139 +1,45 @@
 <template>
   <div>
-    <slot name="load" v-if="status == 'Load'"><Load /></slot>
-    <slot name="notWeb3" v-else-if="status == 'NotWeb3'"><NotWeb3 /></slot>
-    <slot name="depNetwork" v-else-if="status == 'DepNetwork'"><DepNetwork /></slot>
-    <slot name="notAccounts" v-else-if="status == 'NotAccounts'"><NotAccounts /></slot>
-    <slot name="noAccess" v-else-if="status == 'NoAccess'"><NoAccess @requestAccess="requestAccess" /></slot>
-    <slot v-else></slot>
+    <slot
+      name="error"
+      v-if="state.error !== null && (state.error.type !== 'account' || account === true)"
+      v-bind:state="state"
+      v-bind:error="state.error"
+      v-bind:message="state.error.message"
+    >
+      <Error :message="state.error.message"/>
+    </slot>
+    <slot
+      name="load"
+      v-else-if="state.networkId === null || (state.requireAccount === true && account === true && state.account === null)"
+    >
+      <Load/>
+    </slot>
+    <slot v-else v-bind:web3-check="state"></slot>
   </div>
 </template>
 
 <script>
-import NotWeb3 from './NotWeb3.vue'
-import DepNetwork from './DepNetwork.vue'
-import NotAccounts from './NotAccounts.vue'
-import NoAccess from './NoAccess.vue'
-import Load from './Load.vue'
+import Load from "./Load.vue";
+import Error from "./Error.vue";
+import store from "../store";
 
 export default {
-  name: 'Main',
-  components: {
-    NotWeb3,
-    DepNetwork,
-    NotAccounts,
-    NoAccess,
-    Load
-  },
+  name: "Web3Check",
   props: {
-    networks: {
-      type: Array,
-      default: [1]
-    },
-    access: {
+    account: {
       type: Boolean,
       default: true
     }
   },
-  data () {
+  components: {
+    Error,
+    Load
+  },
+  data() {
     return {
-      status: 'Load'
-    }
-  },
-  created () {
-    this.load()
-  },
-  methods: {
-    checkNetwork (network) {
-      const check = this.networks.find((item) => {
-        if (Number(item) === network) {
-          return true
-        } else {
-          return false
-        }
-      })
-      if (check) {
-        this.status = ''
-        return true
-      }
-      this.status = 'DepNetwork'
-      return false
-    },
-    listenNetwork () {
-      web3.version.getNetwork((e, r) => {
-        this.checkNetwork(Number(r))
-        this.listeningChangeNetwork(Number(r))
-      })
-    },
-    listeningChangeNetwork (current) {
-      const networkInterval = (network) => {
-        web3.version.getNetwork((e, r) => {
-          if (Number(r) !== network) {
-            const check = this.checkNetwork(Number(r))
-            this.$emit('changeNetwork', { network: Number(r), check })
-          }
-          setTimeout(() => {
-            networkInterval(Number(r))
-          }, 1000)
-        })
-      }
-      networkInterval(current)
-    },
-    listeningChangeAccount () {
-      let [account] = web3.eth.accounts
-      const accountInterval = () => {
-        if (web3.eth.accounts.length <= 0) {
-          this.status = 'NotAccounts'
-        } else if (web3.eth.accounts[0] !== account) {
-          [account] = web3.eth.accounts
-          this.$emit('changeAccount')
-        }
-        setTimeout(() => {
-          accountInterval()
-        }, 1000)
-      }
-      accountInterval()
-    },
-    isAccount () {
-      setTimeout(() => {
-        if (window.web3.eth.accounts.length > 0) {
-          this.listenNetwork()
-        } else if (window.web3.eth.accounts.length <= 0) {
-          this.status = 'NotAccounts'
-        }
-        this.listeningChangeAccount()
-      }, 500)
-    },
-    async requestAccess () {
-      try {
-        await window.ethereum.enable()
-        this.isAccount()
-      } catch (error) {
-        console.log(error)
-        this.status = 'NoAccess'
-      }
-    },
-    load () {
-      window.addEventListener('load', () => {
-        if (window.ethereum) {
-          window.web3 = new Web3(window.ethereum)
-          if (this.access) {
-            this.requestAccess()
-          } else {
-            this.listenNetwork()
-          }
-        } else if (window.web3) {
-          window.web3 = new Web3(web3.currentProvider)
-          if (this.access) {
-            this.isAccount()
-          } else {
-            this.listenNetwork()
-          }
-        } else {
-          this.status = 'NotWeb3'
-        }
-      })
-    }
+      state: store.state
+    };
   }
-}
+};
 </script>
