@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <fragment>
     <slot
       name="error"
       v-if="state.error !== null && (state.error.type !== 'account' || account === true)"
@@ -16,10 +16,11 @@
       <Load/>
     </slot>
     <slot v-else v-bind:web3-check="state"></slot>
-  </div>
+  </fragment>
 </template>
 
 <script>
+import { Fragment } from 'vue-fragment';
 import Load from "./Load.vue";
 import Error from "./Error.vue";
 import store from "../store";
