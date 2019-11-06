@@ -1,11 +1,5 @@
 <template>
-  <div>
-    <div>
-      <div>
-        <h1>Load dApp</h1>
-      </div>
-    </div>
-  </div>
+  <div>Load dApp</div>
 </template>
 
 <script>

@@ -4,10 +4,11 @@ import store, { ACTIONS } from './store';
 import load from './watcher';
 import Account from './account';
 
-export { components, ACTIONS };
-
 export default {
-  install: install,
+  install,
+  store,
+  components,
+  ACTIONS,
   init: options => {
     if (options.networks) {
       store.dispatch(ACTIONS.NETWORKS, options.networks, false);
@@ -15,9 +16,11 @@ export default {
     if (options.requireAccount) {
       store.dispatch(ACTIONS.REQUIRE_ACCOUNT, options.requireAccount, false);
     }
+    if (options.fallback) {
+      store.dispatch(ACTIONS.FALLBACK, options.fallback, false);
+    }
     load(options.Web3);
   },
-  store: store,
   access: () => {
     store.dispatch(ACTIONS.REQUIRE_ACCOUNT, true, false);
     return Account.access();

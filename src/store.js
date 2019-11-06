@@ -6,6 +6,7 @@ export const ACTIONS = {
   UPD_NETWORK_ID: 'networkId',
   UPD_ACCOUNT: 'account',
   REQUIRE_ACCOUNT: 'requireAccount',
+  FALLBACK: 'fallback',
   ERROR: 'error'
 };
 
@@ -28,6 +29,11 @@ function reducer(state, action, data) {
     case ACTIONS.REQUIRE_ACCOUNT: {
       return {
         requireAccount: data
+      };
+    }
+    case ACTIONS.FALLBACK: {
+      return {
+        fallback: data
       };
     }
     case ACTIONS.UPD_NETWORK_ID: {
@@ -74,6 +80,7 @@ const store = createStore(
     networkId: null,
     account: null,
     requireAccount: false,
+    fallback: null,
     error: null
   },
   reducer

@@ -41,12 +41,14 @@ const Watcher = {
 
 const checkWeb3 = Web3 => {
   if (window.ethereum) {
-    window.web3 = new Web3(window.ethereum);
     store.dispatch(ACTIONS.WEB3, new Web3(window.ethereum));
     Watcher.watch(true);
   } else if (window.web3) {
     store.dispatch(ACTIONS.WEB3, new Web3(window.web3.currentProvider));
     Watcher.watch(false);
+  } else if (store.state.fallback) {
+    store.dispatch(ACTIONS.WEB3, new Web3(store.state.fallback));
+    Watcher.watch(true);
   } else {
     store.dispatch(ACTIONS.ERROR, { type: 'web3', message: 'not web3' });
   }

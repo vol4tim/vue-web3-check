@@ -12,29 +12,30 @@ npm install vue-web3-check --save
 
 ```javascript
 // main.js
-import Vue from 'vue'
-import * as Web3Check from 'vue-web3-check'
+import Vue from 'vue';
+import * as Web3Check from 'vue-web3-check';
 
-Vue.use(Web3Check);
+Vue.use(Web3Check, {
+  Web3: typeof Web3 !== 'undefined' ? Web3 : null,
+  networks: [1],
+  requireAccount: true
+});
 ```
 
 ```html
 // App.vue
 <template>
-  <web3-check :networks="[1]">
+  <web3Check>
     <template slot="load">
-      load
+      <div>loader</div>
     </template>
-    <template slot="notWeb3">
-      notWeb3
+    <template v-slot:error="props">
+      <div>
+        <p>{{props.error.type}}</p>
+        <p>{{props.message}}</p>
+      </div>
     </template>
-    <template slot="depNetwork">
-      depNetwork
-    </template>
-    <template slot="NotAccounts">
-      NotAccounts
-    </template>
-    <router-view />
-  </web3-check>
+    <div>web3 work</div>
+  </web3Check>
 </template>
 ```
