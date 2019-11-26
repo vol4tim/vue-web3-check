@@ -1,13 +1,13 @@
-import createStore from './createStore';
+import createStore from "./createStore";
 
 export const ACTIONS = {
-  WEB3: 'web3',
-  NETWORKS: 'networks',
-  UPD_NETWORK_ID: 'networkId',
-  UPD_ACCOUNT: 'account',
-  REQUIRE_ACCOUNT: 'requireAccount',
-  FALLBACK: 'fallback',
-  ERROR: 'error'
+  WEB3: "web3",
+  NETWORKS: "networks",
+  UPD_NETWORK_ID: "networkId",
+  UPD_ACCOUNT: "account",
+  REQUIRE_ACCOUNT: "requireAccount",
+  FALLBACK: "fallback",
+  ERROR: "error"
 };
 
 function reducer(state, action, data) {
@@ -16,7 +16,7 @@ function reducer(state, action, data) {
       return {
         web3: data,
         error:
-          state.error !== null && state.error.type === 'web3'
+          state.error !== null && state.error.type === "web3"
             ? null
             : state.error
       };
@@ -40,11 +40,11 @@ function reducer(state, action, data) {
       return {
         networkId: data.id,
         error:
-          state.error !== null && state.error.type !== 'network'
+          state.error !== null && state.error.type !== "network"
             ? state.error
             : data.error !== null
             ? {
-                type: 'network',
+                type: "network",
                 message: data.error
               }
             : null
@@ -54,7 +54,7 @@ function reducer(state, action, data) {
       return {
         account: data,
         error:
-          state.error !== null && state.error.type !== 'account'
+          state.error !== null && state.error.type !== "account"
             ? state.error
             : null
       };
@@ -87,11 +87,11 @@ const store = createStore(
 );
 
 let load = false;
-store.on('update', ({ state }) => {
+store.on("update", ({ state }) => {
   if (load === false) {
     if (state.new.requireAccount === false) {
       if (state.new.networkId !== null && state.new.error === null) {
-        store._event.emit('load', state.new);
+        store._event.emit("load", state.new);
         load = true;
       }
     } else {
@@ -100,7 +100,7 @@ store.on('update', ({ state }) => {
         state.new.account !== null &&
         state.new.error === null
       ) {
-        store._event.emit('load', state.new);
+        store._event.emit("load", state.new);
         load = true;
       }
     }

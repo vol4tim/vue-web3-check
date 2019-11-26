@@ -1,4 +1,4 @@
-import store, { ACTIONS } from './store';
+import store, { ACTIONS } from "./store";
 
 export default {
   check(network) {
@@ -12,24 +12,20 @@ export default {
     return Boolean(check);
   },
   upd() {
-    return new Promise(resolve => {
-      // https://web3js.readthedocs.io/en/1.0/web3-eth.html#getchainid
-      store.state.web3.version.getNetwork((e, r) => {
-        if (Number(r) !== store.state.networkId) {
-          if (this.check(Number(r))) {
-            store.dispatch(ACTIONS.UPD_NETWORK_ID, {
-              id: Number(r),
-              error: null
-            });
-          } else {
-            store.dispatch(ACTIONS.UPD_NETWORK_ID, {
-              id: Number(r),
-              error: 'dep network'
-            });
-          }
+    return store.state.web3.eth.net.getId().then(r => {
+      if (Number(r) !== store.state.networkId) {
+        if (this.check(Number(r))) {
+          store.dispatch(ACTIONS.UPD_NETWORK_ID, {
+            id: Number(r),
+            error: null
+          });
+        } else {
+          store.dispatch(ACTIONS.UPD_NETWORK_ID, {
+            id: Number(r),
+            error: "dep network"
+          });
         }
-        resolve();
-      });
+      }
     });
   }
 };

@@ -1,8 +1,8 @@
-import * as components from './components';
-import install from './install';
-import store, { ACTIONS } from './store';
-import load from './watcher';
-import Account from './account';
+import * as components from "./components";
+import install from "./install";
+import store, { ACTIONS } from "./store";
+import load from "./watcher";
+import Account from "./account";
 
 export default {
   install,

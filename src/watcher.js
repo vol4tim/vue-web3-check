@@ -1,6 +1,6 @@
-import store, { ACTIONS } from './store';
-import Network from './network';
-import Account from './account';
+import store, { ACTIONS } from "./store";
+import Network from "./network";
+import Account from "./account";
 
 const Watcher = {
   isWacher: false,
@@ -15,7 +15,7 @@ const Watcher = {
         .then(() => {
           if (
             store.state.requireAccount &&
-            (store.state.error === null || store.state.error.type !== 'network')
+            (store.state.error === null || store.state.error.type !== "network")
           ) {
             if (!isNewVersion || store.state.web3.eth.accounts.length > 0) {
               return Account.upd();
@@ -50,13 +50,13 @@ const checkWeb3 = Web3 => {
     store.dispatch(ACTIONS.WEB3, new Web3(store.state.fallback));
     Watcher.watch(true);
   } else {
-    store.dispatch(ACTIONS.ERROR, { type: 'web3', message: 'not web3' });
+    store.dispatch(ACTIONS.ERROR, { type: "web3", message: "not web3" });
   }
 };
 
 export default Web3 => {
-  if (document.readyState !== 'complete') {
-    window.addEventListener('load', () => {
+  if (document.readyState !== "complete") {
+    window.addEventListener("load", () => {
       checkWeb3(Web3);
     });
   } else {

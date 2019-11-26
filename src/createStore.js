@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import EventEmitter from "events";
 
 export default function create(state, reducer) {
   return {
@@ -15,7 +15,7 @@ export default function create(state, reducer) {
         this.state[k] = newState[k];
       });
       if (emit) {
-        this._event.emit('update', { action, state: { old, new: this.state } });
+        this._event.emit("update", { action, state: { old, new: this.state } });
       }
     }
   };

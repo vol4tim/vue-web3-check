@@ -2,7 +2,10 @@
   <Fragment>
     <slot
       name="error"
-      v-if="state.error !== null && (state.error.type !== 'account' || account === true)"
+      v-if="
+        state.error !== null &&
+          (state.error.type !== 'account' || account === true)
+      "
       v-bind:state="state"
       v-bind:error="state.error"
       v-bind:message="state.error.message"
@@ -11,7 +14,12 @@
     </slot>
     <slot
       name="load"
-      v-else-if="state.networkId === null || (state.requireAccount === true && account === true && state.account === null)"
+      v-else-if="
+        state.networkId === null ||
+          (state.requireAccount === true &&
+            account === true &&
+            state.account === null)
+      "
     >
       <Load />
     </slot>
