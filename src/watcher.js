@@ -17,7 +17,7 @@ const Watcher = {
             store.state.requireAccount &&
             (store.state.error === null || store.state.error.type !== "network")
           ) {
-            if (!isNewVersion || store.state.web3.eth.accounts.length > 0) {
+            if (!isNewVersion || this.check) {
               return Account.upd();
             } else if (this.check === false) {
               return Account.access().then(access => {
